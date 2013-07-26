@@ -24,6 +24,15 @@
     // ======== std alias ======== //
     global.$$ = {};
     mergeProps(global.$$,core);
+    
+    // ======== hacks ======== //
+    // [Logging] //
+    //console.logが存在しない環境への対策。何もしない関数を実行する
+    if (isUndefined(global.console)) {
+        global.console = {
+            log: function(){}
+        };
+    }
 
     // ======== function definitions ======== //
     // [Util] //
