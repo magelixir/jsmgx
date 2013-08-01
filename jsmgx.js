@@ -30,7 +30,7 @@
     //console.logが存在しない環境への対策。何もしない関数を実行する
     if (isUndefined(global.console)) {
         global.console = {
-            log: function(){}
+            log: doNothing
         };
     }
 
@@ -43,6 +43,10 @@
         for(var pName in b){
             a[pName] = b[pName];
         }
+    }
+    
+    function doNothing(){
+        //なにもしない関数
     }
     
     
