@@ -57,6 +57,13 @@ test("merge関数テスト", function(){
     
 });
 
+test("trimStringテスト",function(){
+    ok($$.trimString(" あいうえお　")==="あいうえお","trimString関数によるトリム");
+    ok("　あわわ   ".trim()==="あわわ","String#trimメソッドによるトリム");
+});
+
+
+
 module("Type系");
 
 test("isNull", function(){

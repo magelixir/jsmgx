@@ -6,6 +6,8 @@
     var core = { 
         //[Util]
         mergeProps:  mergeProps,
+        doNothing:   doNothing,
+        trimString:  trimString,
         //[Type]
         isNull:      isNull,
         isUndefined: isUndefined,
@@ -33,6 +35,10 @@
             log: doNothing
         };
     }
+    
+    // [String] //
+    //String型に関数を追加する
+    String.prototype.trim = function(){return trimString(this);};
 
     // ======== function definitions ======== //
     // [Util] //
@@ -47,6 +53,11 @@
     
     function doNothing(){
         //なにもしない関数
+    }
+    
+    //文字列のトリム
+    function trimString(str){
+        return str.replace(/^\s+|\s+$/g, "");
     }
     
     
