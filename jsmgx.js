@@ -5,19 +5,20 @@
     //jsmgx core object
     var core = { 
         //[Util]
-        mergeProps:  mergeProps,
-        doNothing:   doNothing,
-        trimString:  trimString,
+        mergeProps:     mergeProps,
+        doNothing:      doNothing,
+        trimString:     trimString,
+        containsString: containsString,
         //[Type]
-        isNull:      isNull,
-        isUndefined: isUndefined,
-        isObject:    isObject,
-        isFunction:  isFunction,
-        isArray:     isArray,
-        isBoolean:   isBoolean,
-        isString:    isString,
-        isNumber:    isNumber,
-        isDate:      isDate
+        isNull:         isNull,
+        isUndefined:    isUndefined,
+        isObject:       isObject,
+        isFunction:     isFunction,
+        isArray:        isArray,
+        isBoolean:      isBoolean,
+        isString:       isString,
+        isNumber:       isNumber,
+        isDate:         isDate
     }; 
 
     // ======== initialize ======== //
@@ -37,8 +38,9 @@
     }
     
     // [String] //
-    //String型に関数を追加する
+    //String型にメソッドを生やす
     String.prototype.trim = function(){return trimString(this);};
+    String.prototype.contains = function(word){return containsString(this,word);};
 
     // ======== function definitions ======== //
     // [Util] //
@@ -58,6 +60,11 @@
     //文字列のトリム
     function trimString(str){
         return str.replace(/^\s+|\s+$/g, "");
+    }
+    
+    //文字列strにwordが含まれるかどうか調べる
+    function containsString(str,word){
+        return str.indexOf(word) !== -1;
     }
     
     

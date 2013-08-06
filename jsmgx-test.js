@@ -62,6 +62,13 @@ test("trimStringテスト",function(){
     ok("　あわわ   ".trim()==="あわわ","String#trimメソッドによるトリム");
 });
 
+test("containsStringテスト",function(){
+    ok($$.containsString(" あいうえお","うえ"),"containsStringによる文字列含有チェック");
+    ok(!$$.containsString(" あいうえお","おえ"),"containsStringによる文字列含有チェック（存在しない場合）");
+    ok("ドラえもん".contains("ラ"),"String#containsメソッドによる文字列含有チェック");
+    ok(!"ドラえもん".contains("エ"),"String#containsメソッドによる文字列含有チェック（存在しない場合）");
+});
+
 
 
 module("Type系");
