@@ -79,15 +79,9 @@ test("ブラウザ判定",function(){
 module("動作チェック");
 
 test("onload",function(){
-    var img = document.createElement("img");
-    img.src = "http://repo.shift-the-oracle.com/images/logo-topics.png";
-    img.onload = function(){alert("画像読み込み完了");} ;
-    document.body.appendChild(img);
     
-    var script = document.createElement("script");
-    script.src = "http://code.jquery.com/jquery-1.10.1.min.js";
-    script.onload = function(){alert("スクリプト読み込み完了");} ;
-    document.getElementsByTagName("head").item(0).appendChild(script);
+    var src = "http://code.jquery.com/jquery-1.10.1.min.js";
+    $$.loadScript(src,function(test){alert("スクリプトよんだよ : " + src);});
     
     ok($$.getUAString(),"UserAgent : " + $$.getUAString());
 });

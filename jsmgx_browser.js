@@ -13,6 +13,9 @@
     
     //publicなオブジェクト登録用変数
     var browser = {
+        //[スクリプト]
+        loadScript       : loadScript,
+        //[ブラウザ判定]
         getUAString      : getUAString,
         isIE             : isIE,
         isFF             : isFF,
@@ -35,9 +38,67 @@
     //このライブラリの関数はエイリアスにマージ
     $$.mergeProps(global.$$,browser);
     
-    // ======== function definitions ======== //    
-    // [browser discrimination]
+    // ======== function definitions ======== //
     
+    // [script loading]
+    
+    /**
+     * ソースを指定してスクリプトを読み込ませる関数。
+     * 読み込み完了時にcallbackを動かす。
+     */
+    function loadScript(src,callback){
+        
+        //script要素の作成
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.setAttribute("src",src);
+        
+        script.onload = function(){
+            this.onload = $$.doNothing; //一度実行したら関数の登録を消す
+            callback.call(this,src);
+        };
+        
+        script.onreadystatechange = function(){
+            //主にIE8以前対策。onreadystatechangeでもonload関数を動かす
+            if(this.readyState == "complete" || this.readyState == "loaded"){
+                this.onload();
+            }
+        };
+        
+        //head要素の子要素として追加
+        document.getElementsByTagName("head").item(0).appendChild(script);
+        
+    }
+    
+    /**
+     * JavaScriptを動的ロードした後に任意の関数を動かす
+     * @param pathList パスの配列
+     * @param onLoaded JSファイルを全部認識したあとに動かす関数
+     */
+    function loadScriptList(pathList,onLoaded){
+
+        load(0);
+        
+        //scriptロード完了時のcallbackを再帰的に呼ぶ
+        function load(index){
+            if(index < pathList.length){
+                loadScript(pathList[index],function(src){
+                    load(index+1);
+                });
+            } else {
+                onLoaded();
+            }
+        }
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    // [browser discrimination]
     /**
      * -*-*-*- ブラウザ判別関数仕様 -*-*-*-
      * 
