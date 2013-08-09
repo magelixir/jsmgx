@@ -88,9 +88,7 @@ test("isUndefined", function(){
     ok(!$$.isUndefined("abc"),"文字列リテラルはUndefined型ではない");
     var obj = {};
     ok($$.isUndefined(obj.prop),"未定義のプロパティはUndefined型");
-    throws(function () {
-        $$.isUndefined(miteigi);
-    }, ReferenceError, "未定義変数を利用（実引数として代入）するとRefference Error");
+    throws(function(){ $$.isUndefined(miteigi); }, null, "未定義変数を利用（実引数として代入）するとException");
 });
 
 test("isObject", function(){    
