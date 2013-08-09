@@ -1,3 +1,6 @@
+/**
+ * ブラウザに関係する基本関数群
+ */
 (function(global,jsmgx_browser,undefined){
 
     if(jsmgx_browser) return; //自分自身読み込み済み

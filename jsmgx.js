@@ -1,3 +1,6 @@
+/**
+ * （なるべく）環境に依存しないJavaScriptコアで使える関数群
+ */
 (function(global,jsmgx_core,undefined){
 
     if(jsmgx_core) return; //ロード済み
@@ -59,7 +62,7 @@
     
     //文字列のトリム
     function trimString(str){
-        return str.replace(/^\s+|\s+$/g, "");
+        return str.replace(/(^[\s　]+)|([\s　]+$)/g, "");
     }
     
     //文字列strにwordが含まれるかどうか調べる
