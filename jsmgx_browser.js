@@ -10,11 +10,19 @@
     
     //publicなオブジェクト登録用変数
     var browser = {
-        getUAString: getUAString,
-        isIE       : isIE,
-        isFF       : isFF,
+        getUAString      : getUAString,
+        isIE             : isIE,
+        isFF             : isFF,
+        isChrome         : isChrome,
+        isSafari         : isSafari,
+        isOpera          : isOpera,
+        isWebkit         : isWebkit,
+        isIE6            : isIE6,
+        isIE7            : isIE7,
+        isIE8            : isIE8,
+        initSniffingCache: initSniffingCache,
         //一応公開するが内部用の参照は固定しておく
-        _sniff     : function(target){ return _sniff(target); }
+        _sniff           : function(target){ return _sniff(target); }
     };
     
     // ======== initialize ======== //
@@ -79,14 +87,60 @@
         return global.navigator.userAgent.toLowerCase();
     }
     
+    function getAppVersion(){
+        return global.navigator.appVersion.toLowerCase();
+    }
+    
     //IEかどうか判定する
     function isIE(nocache,dynamic){
-        return _isBrowser(UA.MSIE,"msie",nocache,dynamic);
+        return _isBrowser(UA.MSIE,nocache,dynamic);
+    }
+    
+    //IE6かどうか判定する
+    function isIE6(nocache,dynamic){
+        return _isBrowser(UA.MSIE6,nocache,dynamic);
+    }
+    
+    //IE7かどうか判定する
+    function isIE7(nocache,dynamic){
+        return _isBrowser(UA.MSIE7,nocache,dynamic);
+    }
+    
+    //IE8かどうか判定する
+    function isIE8(nocache,dynamic){
+        return _isBrowser(UA.MSIE8,nocache,dynamic);
     }
     
     //FireFoxかどうか判定する
     function isFF(nocache,dynamic){
-        return _isBrowser(UA.FIREFOX,"firefox",nocache,dynamic);
+        return _isBrowser(UA.FIREFOX,nocache,dynamic);
+    }
+    
+    //Chromeかどうか判定する
+    function isChrome(nocache,dynamic){
+        return _isBrowser(UA.CHROME,nocache,dynamic);
+    }
+    
+    //Safariかどうか判定する
+    function isSafari(nocache,dynamic){
+        return _isBrowser(UA.SAFARI,nocache,dynamic);
+    }
+    
+    //Webkitかどうか判定する
+    function isWebkit(nocache,dynamic){
+        return _isBrowser(UA.WEBKIT,nocache,dynamic);
+    }
+    
+    //Operaかどうか判定する
+    function isOpera(nocache,dynamic){
+        return _isBrowser(UA.OPERA,nocache,dynamic);
+    }
+    
+    /**
+     * ブラウザ判定用のキャッシュをクリアする
+     */
+    function initSniffingCache(){
+        UA.cache = {};
     }
     
     //targetで指定したブラウザかどうか判定する。uaDetectorはUA文字列から抽出する文字。
@@ -103,7 +157,7 @@
                 result = _sniff(target) === target;
             } else {
                 //静的モード（UserAgent情報から取得して判別する）
-                result = getUAString().contains(uaDetector);
+                result = _detectUAType(target) === target;
             }
             if(!nocache){
                 //キャッシュの更新
@@ -115,6 +169,35 @@
         }
         
         return result;
+        
+    }
+    
+    //UserAgent情報によるブラウザ判別
+    function _detectUAType(target){
+        
+        var uastr = getUAString();
+        
+        switch(target){
+        default:
+        //target指定が無い場合は下記を順番に全部チェックさせる
+        case UA.MSIE:     if(uastr.contains("msie"))     return UA.MSIE;
+        case UA.FIREFOX:  if(uastr.contains("firefox"))  return UA.FIREFOX;
+        case UA.OPERA:    if(uastr.contains("opera"))    return UA.OPERA;
+        case UA.CHROME:   if(uastr.contains("chrome"))   return UA.CHROME;
+        case UA.SAFARI:   if(uastr.contains("safari") 
+                         && !uastr.contains("chrome"))   return UA.SAFARI;
+        case UA.WEBKIT:   if(uastr.contains("webkit"))   return UA.WEBKIT;
+        case UA.MOBILE:   if(uastr.contains("mobile"))   return UA.MOBILE; //これだけだと弱い
+            break;
+        case UA.MSIE8:
+            if(getAppVersion().contains("msie 8.0")) return UA.MSIE8;  
+        case UA.MSIE7:
+            if(getAppVersion().contains("msie 7.0")) return UA.MSIE7;            
+        case UA.MSIE6:
+            if(getAppVersion().contains("msie 6.0")) return UA.MSIE6;
+        }
+        
+        return UA.UNKNOWN;
         
     }
     
@@ -132,7 +215,11 @@
         case UA.MSIE:     if(doc.uniqueID) return UA.MSIE;
         case UA.FIREFOX:  if(win.sidebar)  return UA.FIREFOX;
         case UA.OPERA:    if(win.opera)    return UA.OPERA;
-            //ここにCHROMEとSAFARIの区別式入れたい
+        case UA.CHROME:   if(win.chrome)   return UA.CHROME;
+        case UA.SAFARI:
+            if(Object.prototype.toString.call(win.HTMLElement).indexOf('Constructor') > 0){
+                return UA.SAFARI;
+            } 
         case UA.WEBKIT:
             if(!doc.uniqueID && !win.opera && !win.sidebar //←念のため
                     && win.localStorage && $$.isUndefined(win.orientation)){
@@ -160,18 +247,6 @@
         
         return UA.UNKNOWN;
     }
-    
-    
-    //[キャッシュモードの考え方]
-    //どのブラウザであるかは一意で確定するとする。
-    //問題はキャッシュ済み状態で変更が加わったときをどうするか。
-    //UA情報書き換えをハンドリングすることは出来ないが、
-    //もしもnocacheで呼び出されたときに、書き換えが判明したらそれに対応しなければならない
-    //[厳密性について]
-    //  nocache,  dynamic  : 一番正確で書き換えにも対応できるが毎回の判別が重い
-    //  nocache, !dynamic  : 書き換えに対応でき毎回の判別も重くはないが、UA情報依存
-    // !nocache,  dynamic  : 書き換えに対応できないが二回目以降は高速
-    // !nocache, !dynamic  : 書き換えに対応できないしUA情報依存だが二回目以降は高速
     
     
 })(this,this.js_lib_jsmgx_browser);
